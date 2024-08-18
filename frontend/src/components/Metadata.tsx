@@ -1,4 +1,4 @@
-import { metadataItem } from '../types';
+import { metadataItemI } from '../types';
 
 export const Metadata = ({
   index,
@@ -6,7 +6,7 @@ export const Metadata = ({
   title,
   description,
   image,
-}: metadataItem) => {
+}: metadataItemI) => {
   return (
     <div className="metadata" key={index}>
       <p>

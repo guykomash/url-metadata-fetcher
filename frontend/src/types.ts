@@ -1,4 +1,4 @@
-export interface metadataItem {
+export interface metadataItemI {
   index: number;
   url: string;
   title: string;
@@ -6,7 +6,7 @@ export interface metadataItem {
   image: string;
 }
 
-export interface invalidURL {
+export interface invalidURLI {
   index: number;
   url: string;
   error: string;
