@@ -1,6 +1,8 @@
 import express, { response } from 'express';
 import logger from './middleware/logger';
+import { rateLimiter } from './middleware/rateLimiter';
 import urlMetadata from 'url-metadata';
+
 import { Request as expressReq, Response as expressRes } from 'express';
 
 export async function fetchData(req: expressReq, res: expressRes) {}
@@ -14,21 +16,8 @@ const app = express();
 
 app.use(logger);
 app.use(cors(corsOptions));
+app.use(rateLimiter);
 app.use(express.json());
-
-// app.get('/', async (req: expressReq, res: expressRes) => {
-//   try {
-//     const url = 'https://www.npmjs.com/package/dfurl-metadata';
-//     const metadata = await urlMetadata(url);
-//     console.log(metadata);
-//     const { title, description, image } = metadata;
-//     console.log(title);
-//     console.log(description);
-//     console.log(image);
-//   } catch (err) {
-//     throw new Error('Failed to fetch metadata.');
-//   }
-// });
 
 app.post('/fetch-data', async (req: expressReq, res: expressRes) => {
   try {
@@ -72,12 +61,13 @@ app.post('/fetch-data', async (req: expressReq, res: expressRes) => {
 
         // Everything went well. resolve
         console.log(`Resolving ${url}`);
+        console.log('image', image);
         return Promise.resolve({
           index: index,
           url: url,
           title: title ?? 'No title in metadata.',
           description: description ?? 'No description in metadata.',
-          image: image ?? 'No image in metadata.',
+          image: image || image === '' ? 'No image in metadata.' : image,
         });
       } catch (err) {
         console.log(`Rejecting ${url}`);
