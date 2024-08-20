@@ -1,0 +1,23 @@
+{
+  "name": "url-metadata-fetcher",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "test": "npm run test --prefix backend && npm run test --prefix frontend",
+    "install": "cd backend && npm install && cd ../frontend && npm install",
+    "backend:dev": "cd ./backend && npm run dev",
+    "frontend:dev": "cd ./frontend && npm run dev",
+    "build": "cd backend && npm run build && cd ../frontend && npm run build",
+    "start": "concurrently \"npm run start-backend\" \"npm run start-frontend\"",
+    "start-backend": "cd backend && npm install --only=prod && npm start",
+    "start-frontend": "cd frontend && npm start"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^8.2.2",
+    "url-metadata-fetcher": "file:"
+  }
+}

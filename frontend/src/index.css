@@ -38,6 +38,7 @@ input {
   color: #101010;
   font-size: 18px;
   padding-left: 10px;
+  border-radius: 8px;
 }
 
 button {

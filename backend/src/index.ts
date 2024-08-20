@@ -1,34 +1,35 @@
 import express, { response } from 'express';
 import logger from './middleware/logger';
 import { rateLimiter } from './middleware/rateLimiter';
+import validator from 'validator';
+import helmet from 'helmet';
 import urlMetadata from 'url-metadata';
-
 import { Request as expressReq, Response as expressRes } from 'express';
-
-export async function fetchData(req: expressReq, res: expressRes) {}
+import cookieParser from 'cookie-parser';
 
 import { corsOptions } from './config/corsOptions';
 import cors from 'cors';
+import csrf from './middleware/csrf';
 
 const PORT = process.env.PORT || 3000;
 
 const app = express();
-
-app.use(logger);
+app.use(helmet());
 app.use(cors(corsOptions));
 app.use(rateLimiter);
+app.use(cookieParser());
 app.use(express.json());
+app.use(logger);
+app.use(csrf);
 
 app.post('/fetch-data', async (req: expressReq, res: expressRes) => {
   try {
     if (!req.body) {
-      console.error('No body');
       return res.status(400).json({ err: 'No body in request' });
     }
 
     const { urls } = req.body;
     if (!urls) {
-      console.error('No urls in body');
       return res.status(400).json({ err: 'No urls in request body' });
     }
 
@@ -41,10 +42,10 @@ app.post('/fetch-data', async (req: expressReq, res: expressRes) => {
     // Fetch URLs simultaneously. Each fetch is independent.
     const URLPromises = urls.map(async (url, index) => {
       try {
-        console.log(`Fetching metadata of: ${url}`);
-        const response = await urlMetadata(url, {
-          ensureSecureImageRequest: true,
-        })
+        if (!validator.isURL(url)) {
+          throw new Error('Invalid URL.');
+        }
+        const response = await urlMetadata(url)
           .then((metadata) => {
             return metadata;
           })
@@ -53,24 +54,19 @@ app.post('/fetch-data', async (req: expressReq, res: expressRes) => {
           });
 
         const { title, description, image } = response;
-        // if (!title && !description && !image) {
-        //   throw new Error(
-        //     'No title, description or image in the fetched metadata.'
-        //   );
-        // }
 
         // Everything went well. resolve
-        console.log(`Resolving ${url}`);
-        console.log('image', image);
+        // console.log(`Resolving ${url}`);
         return Promise.resolve({
           index: index,
           url: url,
-          title: title ?? 'No title in metadata.',
-          description: description ?? 'No description in metadata.',
-          image: image || image === '' ? 'No image in metadata.' : image,
+          title: title ? title : 'No title in metadata.',
+          description: description
+            ? description
+            : 'No description in metadata.',
+          image: image ? image : 'No image in metadata.',
         });
       } catch (err) {
-        console.log(`Rejecting ${url}`);
         let errorMessege = `Failed to fetch the metadata of this URL. :(`;
         if (err instanceof Error) {
           errorMessege = err.message;
@@ -96,3 +92,5 @@ app.post('/fetch-data', async (req: expressReq, res: expressRes) => {
 });
 
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+
+export default app;

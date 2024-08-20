@@ -6,7 +6,7 @@ import { ErorrMetadata } from './components/ErorrMetadata';
 import { invalidURLI, metadataItemI, URLObj } from './types';
 import { v4 as uuidv4 } from 'uuid';
 
-function isMetadataItem(object: any): object is metadataItemI {
+function isMetadataItem(object: object): object is metadataItemI {
   return 'title' in object && 'image' in object && 'description' in object;
 }
 
@@ -30,9 +30,12 @@ function App() {
         throw new Error('Not Enough URLs.');
       }
       console.log('urls', urls);
-      const response = await axios.post('http://localhost:3000/fetch-data', {
-        urls: urls,
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_SERVER_API_URL}/fetch-data`,
+        {
+          urls: urls,
+        }
+      );
       const respMetadatas = response.data.metadatas;
       console.log('RESPONSE');
       console.log(respMetadatas);
@@ -87,7 +90,8 @@ function App() {
 
     // check that urls are valid !
     const validURLs = urls.map((u) => u.url).filter((u) => u);
-
+    const validInputs = urls.filter((u, index) => index <= 2 || u.url);
+    setUrls(validInputs);
     await postUrls(validURLs);
   };
 
@@ -154,7 +158,7 @@ function App() {
               }}
               onClick={handleURLAdd}
             >
-              ➕ Add another URL
+              Add another URL ➕
             </button>
             <br />
             <button
