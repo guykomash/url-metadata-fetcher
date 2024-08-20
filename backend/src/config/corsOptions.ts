@@ -1,7 +1,8 @@
-const clientUrl = process.env.CLIENT_URL || 'http://127.0.0.1:8080';
-
+import 'dotenv/config';
+const MODE = process.env.MODE;
+const clientUrl =
+  MODE === 'development' ? process.env.CLIENT_URL_DEV : process.env.CLIENT_URL;
 const corsOptions = {
   origin: clientUrl,
 };
-
 export { corsOptions };
