@@ -29,7 +29,6 @@ function App() {
       if (urls.length < 3) {
         throw new Error('Not Enough URLs.');
       }
-      console.log('urls', urls);
       const response = await axios.post(
         `${import.meta.env.VITE_SERVER_API_URL}/fetch-data`,
         {
@@ -37,8 +36,6 @@ function App() {
         }
       );
       const respMetadatas = response.data.metadatas;
-      console.log('RESPONSE');
-      console.log(respMetadatas);
       setMetadatas(
         respMetadatas.map((resp: PromiseSettledResult<metadataItemI>) => {
           if (resp.status == 'fulfilled') {
@@ -83,7 +80,6 @@ function App() {
         ustate.id === id ? { id: ustate.id, url: value } : ustate
       )
     );
-    console.log(urls);
   };
   const handleSubmit = async () => {
     setMetadatas([]);
@@ -106,7 +102,6 @@ function App() {
 
   const handleURLAdd = () => {
     const newUrl = { id: uuidv4(), url: '' };
-    console.log(newUrl);
     setUrls((prev) => [...prev, newUrl]);
   };
   return (
